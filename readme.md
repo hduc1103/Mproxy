@@ -77,7 +77,9 @@ This project implements two mproxy servers which are **TCP Proxy Server** and **
    - When the program starts, 2 mproxy servers are listening on 2 different ports for message incoming.  
    - The messages sent by devices are assigned to the appropriate mproxy server for being processed.
    - The valid messages are finally published to mqtt broker.
-<p align="center"><img src="diagram.png"></p>
+<p align="center">
+  <img src="diagram.png" style="background-color: white; padding: 10px;">
+</p>
 
 ## How It Works
 1. **Client Connection:**
