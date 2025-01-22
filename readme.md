@@ -37,6 +37,10 @@ This project implements two mproxy servers which are **TCP Proxy Server** and **
    ```sql
    CREATE DATABASE proxy;
    USE proxy;
+   CREATE TABLE devices (
+   device_id varchar(256) PRIMARY KEY,
+   password VARCHAR(256)
+   );
    CREATE TABLE messages (
        id INT AUTO_INCREMENT PRIMARY KEY,
        message TEXT NOT NULL,
@@ -90,7 +94,7 @@ This project implements two mproxy servers which are **TCP Proxy Server** and **
 
 3. **Spam Check:**
    - Checks the database for the last 5 message timestamp for the given `device_id`.
-   - In case the average gap time of the 5 latest message is 
+   - In case the average gap time of the 5 latest message is less than 1 minutes and the previous message was sent less than 30 minutes, the device's message won't be forwarded to mqtt.
 
 4. **Database Storage:**
    - Stores the message in the MySQL database.
@@ -101,7 +105,7 @@ This project implements two mproxy servers which are **TCP Proxy Server** and **
 ## Example Message Format
 ```json
 {
-  "device_id": "device1",
+  "token": "your_token",
   "message": "Hello, World!"
 }
 ```

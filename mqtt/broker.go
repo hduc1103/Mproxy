@@ -17,7 +17,7 @@ func GetBrokerClient(mproxy string) mqtt.Client {
 	once.Do(func() {
 		opts := mqtt.NewClientOptions()
 		opts.AddBroker("mqtt://localhost:1883")
-		opts.SetClientID("shared-broker-forwarder")
+		opts.SetClientID("mproxy-client")
 		opts.SetKeepAlive(2 * time.Second)
 		opts.SetPingTimeout(1 * time.Second)
 

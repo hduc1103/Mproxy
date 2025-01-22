@@ -8,7 +8,7 @@ import (
 	"project/handlers"
 )
 
-func TCPMProxy() {
+func TCP_MProxy() {
 	listener, err := net.Listen("tcp", "localhost:1884")
 	if err != nil {
 		log.Printf("Failed to start proxy server: %v", err)

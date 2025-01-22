@@ -20,7 +20,7 @@ func main() {
 
 	message := map[string]string{
 		"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkZXZpY2VfaWQiOiJkZXZpY2VfMTIzIiwiZXhwIjoxNzM3NjE4OTMxfQ.7-XY2WB0od3AR6OAbWIpE8B1v4fF1ZYhXZaOOE6OnqU",
-		"message":   "Hellloooo",
+		"message":   "Nice Try",
 	}
 
 	jsonMessage, err := json.Marshal(message)

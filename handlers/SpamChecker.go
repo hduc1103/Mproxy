@@ -35,7 +35,7 @@ func CheckSpam(db *sql.DB, deviceID string) (bool, error) {
 	}
 
 	cur_time := time.Now()
-	if cur_time.Sub(timestamps[0]) > 60*time.Second {
+	if cur_time.Sub(timestamps[0]) > 30*time.Minute {
 		return false, nil
 	}
 
@@ -45,7 +45,7 @@ func CheckSpam(db *sql.DB, deviceID string) (bool, error) {
 	}
 
 	average_gap := total_gap / time.Duration(len(timestamps)-1)
-	is_spamming := average_gap < 30*time.Second
+	is_spamming := average_gap < 1*time.Minute
 
 	if is_spamming {
 		log.Printf("Device %s is spamming. Average gap: %v\n", deviceID, average_gap)

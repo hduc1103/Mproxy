@@ -5,8 +5,8 @@ import (
 )
 
 func main() {
-	go proxies.TCPMProxy()
-	go proxies.HTTPMProxy()
+	go proxies.TCP_MProxy()
+	go proxies.HTTP_MProxy()
 
 	select {}
 }
