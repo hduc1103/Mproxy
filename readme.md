@@ -1,6 +1,6 @@
-# MProxy Server with MQTT 
+# MProxy Server with MQTT
 
-This project implements two mproxy server which are **TCP Proxy Server** and **HTTP Server**. These two process incoming messages, check for spamming based on device IDs, store messages in a MySQL database, and forward valid messages to the MQTT broker.
+This project implements two mproxy servers which are **TCP Proxy Server** and **HTTP Server**. These process incoming messages, check for spamming based on device IDs, store messages in a MySQL database, and forward valid messages to the MQTT broker.
 
 ## Requirement
 - **Go Programming Language** (1.23.4)
@@ -13,16 +13,17 @@ This project implements two mproxy server which are **TCP Proxy Server** and **H
 
 ## Features
 - **TCP MProxy Server:** Listens for incoming client connections on port 1884.
-- **HTTP Server:** Listens and Accept HTTP with method POST requests on `localhost:1885/message`.
-- **Spam Checking:** Block deviceId in case of sending messages too frequently.
+- **HTTP Server:** Listens and accepts HTTP POST requests on `localhost:1885/message`.
+- **Authorization:** Devices are recognized by Id via token
+- **Spam Checking:** Blocks a device ID in case of sending messages too frequently.
 - **Database Storage:** Stores incoming messages in a MySQL database.
 - **MQTT Forwarding:** Forwards valid messages to the MQTT broker.
 
 ## Installation
 1. Clone the repository:
    ```bash
-   git clone
-   cd 
+   git clone <repository-url>
+   cd <repository-folder>
    ```
 
 2. Install the required Go modules:
@@ -50,6 +51,7 @@ This project implements two mproxy server which are **TCP Proxy Server** and **H
     docker run -d --name vernemq-broker -p 1883:1883 -p 8080:8080 -e "DOCKER_VERNEMQ_ACCEPT_EULA=yes" -e "DOCKER_VERNEMQ_ALLOW_ANONYMOUS=on" vernemq/vernemq
     docker start vernemq-broker
     ```
+
 ## Configuration
 - The database connection string is hardcoded in the `handleClientMessages` function:
   ```go
@@ -71,16 +73,22 @@ This project implements two mproxy server which are **TCP Proxy Server** and **H
 3. The HTTP server listens on `localhost:1885/message` for POST requests.
 4. The broker listens on `localhost:1883` for receiving messages.
 
+## Architecture
+   - When the program starts, 2 mproxy servers are listening on 2 different ports for message incoming.  
+   - The messages sent by devices are assigned to the appropriate mproxy server for being processed.
+   - The valid messages are finally published to mqtt broker.
+<p align="center"><img src="diagram.png"></p>
+
 ## How It Works
 1. **Client Connection:**
-   - Clients connect to the proxy server via TCP on `localhost:1884`.
+   - Clients connect to the proxy server via TCP on `localhost:1884` or through `POST/localhost:1885`.
 
 2. **Message Handling:**
    - The server receives messages in JSON format containing a `device_id` and `message`.
 
 3. **Spam Check:**
-   - Checks the database for the last message timestamp for the given `device_id`.
-   - Within 5 seconds, block any message from the device with that device_id
+   - Checks the database for the last 5 message timestamp for the given `device_id`.
+   - In case the average gap time of the 5 latest message is 
 
 4. **Database Storage:**
    - Stores the message in the MySQL database.
@@ -97,10 +105,12 @@ This project implements two mproxy server which are **TCP Proxy Server** and **H
 ```
 
 ## Testing
-1. **For TCP:**
-- Simple Go code for testing:
-   ```
+
+### 1. For TCP:
+#### Simple Go Code for Testing
+```go
 package main
+
 import (
 	"encoding/json"
 	"fmt"
@@ -120,9 +130,14 @@ func main() {
 	defer conn.Close()
 
 	message := map[string]string{
-		"device_id": "device123",
-		"message":   "Hello1",
+		"token": "",
+		"message":   "Hello",
 	}
+   // In case not signed in
+   // message := map[string]string{
+	// 	"device_id": "",
+	// 	"password":   "",
+	// }
 
 	jsonMessage, err := json.Marshal(message)
 	if err != nil {
@@ -137,30 +152,34 @@ func main() {
 	}
 
 	fmt.Println("Message sent successfully")
-}```
+}
 
-2. **For HTTP: Using Postman**
-- Method: POST
-- url: http://localhost:1885/message
-- Header: 
-    - Key: Content-Type
-    - Value: application/json
-- Body:
+```
+
+### 2. For HTTP: Using Postman
+- **Method:** POST
+- **URL:** `http://localhost:1885/message`
+- **Header:**
+  - Key: `Content-Type`
+  - Value: `application/json`
+- **Body:**
     ```json
     {
-  "device_id": "device122",
-  "message": "Hello!"
+      "token": "",
+      "message": "Hello!"
     }
     ```
+- In case not signed in
+   ```json
+   {
+      "device_id": "",
+      "password": ""
+   }
+   ```
 - **Response:**
   - `200 OK`: Message processed successfully.
+  - `401 Unauthorized`: Unauthorized
   - `400 Bad Request`: Invalid JSON format.
-  - `404 Not Found`: The server might not have been run properly.
+  - `404 Not Found`: The server might not have run properly.
   - `405 Method Not Allowed`: Request method other than POST.
 
-## Logging
-The server logs events such as:
-- Incoming connections and messages.
-- Spam detection.
-- Database operations.
-- MQTT publishing results.

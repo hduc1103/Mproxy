@@ -19,8 +19,8 @@ func main() {
 	defer conn.Close()
 
 	message := map[string]string{
-		"device_id": "device_new",
-		"message":   "Hello tcp",
+		"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkZXZpY2VfaWQiOiJkZXZpY2VfMTIzIiwiZXhwIjoxNzM3NjE4OTMxfQ.7-XY2WB0od3AR6OAbWIpE8B1v4fF1ZYhXZaOOE6OnqU",
+		"message":   "Hellloooo",
 	}
 
 	jsonMessage, err := json.Marshal(message)
@@ -36,4 +36,13 @@ func main() {
 	}
 
 	fmt.Println("Message sent successfully")
+
+	buf := make([]byte, 1024)
+	n, err := conn.Read(buf)
+	if err != nil {
+		fmt.Println("Error reading response:", err)
+		return
+	}
+
+	fmt.Println("Response from server:", string(buf[:n]))
 }
