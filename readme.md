@@ -109,7 +109,11 @@ This project implements two mproxy servers which are **TCP Proxy Server** and **
   "message": "Hello, World!"
 }
 ```
-
+## For statistic about the number of messages each device sent, run statistic.go
+   ```bash
+   go run statistic.go
+   ```
+   
 ## Testing
 
 ### 1. For TCP:

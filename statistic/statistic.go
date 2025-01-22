@@ -34,7 +34,7 @@ func fetchMessageCounts(db *sql.DB) ([]string, []float64) {
 
 func createBarChart(deviceIDs []string, messageCounts []float64) {
 	barChart := chart.BarChart{
-		Title: "Number of Messages per Device ID",
+		Title: "Number of Messages per device ",
 		Height: 512,
 		Width:  1024,
 		Bars:   []chart.Value{},
@@ -47,7 +47,7 @@ func createBarChart(deviceIDs []string, messageCounts []float64) {
 		})
 	}
 
-	f, err := os.Create("statistic/bar_chart.png")
+	f, err := os.Create("bar_chart.png") 
 	if err != nil {
 		log.Fatalf("Failed to create file: %v", err)
 	}
