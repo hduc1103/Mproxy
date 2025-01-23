@@ -19,10 +19,13 @@ func main() {
 	defer conn.Close()
 
 	message := map[string]string{
-		"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkZXZpY2VfaWQiOiJkZXZpY2VfMTIzIiwiZXhwIjoxNzM3NjE4OTMxfQ.7-XY2WB0od3AR6OAbWIpE8B1v4fF1ZYhXZaOOE6OnqU",
-		"message":   "Nice Try",
+		"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkZXZpY2VfaWQiOiJkZXZpY2VfMTIzIiwiZXhwIjoxNzM3NzMyNjI2fQ.r4nDLjV5iNBQ5ypeRZ18GC45FdEnXHPnoOufBPy2dTA",
+		"message":   "12345678",
 	}
-
+	// message := map[string]string{
+	// 	"device_id": "device_123",
+	// 	"password":  "12345678",
+	// }
 	jsonMessage, err := json.Marshal(message)
 	if err != nil {
 		fmt.Println("Error encoding JSON:", err)

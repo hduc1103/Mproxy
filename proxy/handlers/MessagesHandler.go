@@ -28,6 +28,7 @@ func MessagesHandler(broker mqtt.Client, payload []byte) (bool, string) {
 		return false, "Invalid JSON format: " + err.Error()
 	}
 
+
 	if msg.Token == "" {
 		var device models.Device
 		if err := json.Unmarshal(payload, &device); err != nil {
@@ -64,15 +65,17 @@ func MessagesHandler(broker mqtt.Client, payload []byte) (bool, string) {
 		return false, "You are sending messages too frequently. Please slow down."
 	}
 
-	curTime := time.Now()
-	query := `INSERT INTO messages (message, device_id, timestamp) VALUES (?, ?, ?)`
-	_, err = db.Exec(query, msg.Message, deviceID, curTime.Format("2006-01-02 15:04:05"))
+	publishPayload := map[string]string{
+		"device_id": deviceID,   
+		"message":   msg.Message,  
+	}
+	jsonPayload, err := json.Marshal(publishPayload)
 	if err != nil {
-		log.Printf("Error inserting into database: %v", err)
-		return false, "Error saving message to database"
+		log.Printf("Error creating JSON payload for publishing: %v", err)
+		return false, "Failed to create message payload"
 	}
 
-	token := broker.Publish("test/message", 0, false, payload)
+	token := broker.Publish("mproxy/topic", 0, false, jsonPayload)
 	token.Wait()
 
 	if token.Error() != nil {
