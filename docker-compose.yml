@@ -1,0 +1,40 @@
+version: '3.9'
+
+services:
+  mysql:
+      image: mysql:8.0
+      container_name: mysql
+      environment:
+        MYSQL_ROOT_PASSWORD: 123456789
+        MYSQL_DATABASE: proxy
+      ports:
+        - "3307:3306"
+  mqtt-broker:
+    image: vernemq/vernemq
+    container_name: mqtt-broker
+    ports:
+      - "1883:1883" # MQTT
+      - "8080:8080" # HTTP API
+    environment:
+      DOCKER_VERNEMQ_ACCEPT_EULA: "yes"
+      DOCKER_VERNEMQ_ALLOW_ANONYMOUS: "on" 
+
+
+  proxy:
+    build:
+      context: ./proxy
+    container_name: proxy
+    ports:
+      - "1884:1884"
+      - "1885:1885"
+    depends_on:
+      - mqtt-broker
+
+  server:
+    build:
+      context: ./server
+    container_name: server
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mqtt-broker

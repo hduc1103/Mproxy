@@ -9,7 +9,7 @@ import (
 )
 
 func TCP_MProxy() {
-	listener, err := net.Listen("tcp", "localhost:1884")
+	listener, err := net.Listen("tcp", "0.0.0.0:1884")
 	if err != nil {
 		log.Printf("Failed to start proxy server: %v", err)
 		return

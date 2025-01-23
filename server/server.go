@@ -40,7 +40,7 @@ func main() {
 	
 
 	opts := mqtt.NewClientOptions()
-	opts.AddBroker("mqtt://localhost:1883") 
+	opts.AddBroker("tcp://mqtt-broker:1883") 
 	opts.SetClientID("mqtt-server")
 	opts.SetDefaultPublishHandler(messageHandler)
 	client := mqtt.NewClient(opts)
