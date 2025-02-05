@@ -8,7 +8,7 @@ import (
 )
 
 func ConnectDB() (*sql.DB, error) {
-	db, err := sql.Open("mysql", "root:123456789@tcp(mysql:3306)/proxy?parseTime=true&loc=Local")
+	db, err := sql.Open("mysql", "user:password@tcp(mysql:3306)/proxy?parseTime=true&loc=Local")
 	if err != nil {
 		log.Printf("Error connecting to the database: %v", err)
 		return nil, err

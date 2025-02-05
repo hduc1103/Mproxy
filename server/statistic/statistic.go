@@ -62,7 +62,7 @@ func createBarChart(deviceIDs []string, messageCounts []float64) {
 }
 
 func main() {
-	db, err := sql.Open("mysql", "root:123456789@tcp(127.0.0.1:3306)/proxy")
+	db, err := sql.Open("mysql", "user:password@tcp(mysql:3306)/proxy?parseTime=true&loc=Local")
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}

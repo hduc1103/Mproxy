@@ -29,8 +29,7 @@ func HTTP_MProxy() {
 		if err != nil {
 			http.Error(w, "Failed to process message", http.StatusInternalServerError)
 			return
-		}
-
+		}	
 		broker := mqtt.GetBrokerClient("HTTPMproxy")
 		status, response := handlers.MessagesHandler(broker, payload)
 

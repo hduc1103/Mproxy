@@ -56,7 +56,7 @@ func AuthenticateAndGenerateToken(db *sql.DB, deviceID string, password string, 
 	var count int
 	err := db.QueryRow(query, deviceID, password).Scan(&count)
 	if err != nil {
-		return "", errors.New("error querying the database")
+		return "", errors.New(err.Error())
 	}
 	if count == 0 {
 		return "", errors.New("invalid device ID or password")

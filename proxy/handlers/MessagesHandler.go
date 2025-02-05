@@ -28,7 +28,6 @@ func MessagesHandler(broker mqtt.Client, payload []byte) (bool, string) {
 		return false, "Invalid JSON format: " + err.Error()
 	}
 
-
 	if msg.Token == "" {
 		var device models.Device
 		if err := json.Unmarshal(payload, &device); err != nil {

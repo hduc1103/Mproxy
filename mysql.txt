@@ -1,0 +1,113 @@
+If you prefer not to use a Dockerized MySQL container, you can connect your `proxy` and `server` containers directly to an external MySQL database running on your host or another server. Here's how you can achieve this:
+
+---
+
+### **Steps to Connect Docker Containers to External MySQL**
+
+#### 1. **Expose the MySQL Host**
+Make sure your MySQL server is running on your host machine and is accessible from the Docker containers:
+- **Find the IP Address of Your Host Machine**:
+  Use `ipconfig` (Windows) or `ifconfig` (Linux/macOS) to get the host's IP address.
+- **Allow Remote Connections to MySQL**:
+  Edit your `my.cnf` or `mysqld.cnf` file to bind MySQL to all interfaces:
+  ```ini
+  bind-address = 0.0.0.0
+  ```
+  Then restart the MySQL service:
+  ```bash
+  sudo service mysql restart
+  ```
+- **Grant Access to Docker Containers**:
+  Allow connections from the Docker network (e.g., `172.17.0.0/16`) by running the following SQL commands:
+  ```sql
+  GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '123456789';
+  FLUSH PRIVILEGES;
+  ```
+
+---
+
+#### 2. **Update Your `docker-compose.yml`**
+
+Modify your services to use the external MySQL database. Remove the MySQL service if it's included.
+
+Here’s the updated `docker-compose.yml`:
+```yaml
+version: '3.9'
+
+services:
+  proxy:
+    build:
+      context: ./proxy
+    container_name: proxy
+    ports:
+      - "1884:1884"
+      - "1885:1885"
+    environment:
+      MYSQL_HOST: <HOST_IP_ADDRESS>
+      MYSQL_PORT: 3306
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 123456789
+      MYSQL_DATABASE: proxy
+
+  server:
+    build:
+      context: ./server
+    container_name: server
+    ports:
+      - "8081:8081"
+    environment:
+      MYSQL_HOST: <HOST_IP_ADDRESS>
+      MYSQL_PORT: 3306
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 123456789
+      MYSQL_DATABASE: proxy
+
+  mqtt-broker:
+    image: vernemq/vernemq
+    container_name: mqtt-broker
+    ports:
+      - "1883:1883"
+      - "8080:8080"
+    environment:
+      DOCKER_VERNEMQ_ACCEPT_EULA: "yes"
+      DOCKER_VERNEMQ_ALLOW_ANONYMOUS: "on"
+```
+
+Replace `<HOST_IP_ADDRESS>` with the actual IP address of your host machine where MySQL is running.
+
+---
+
+#### 3. **Update Connection Strings in Code**
+
+In your `proxy` and `server` applications, update the MySQL connection string to use the host's IP address:
+```go
+db, err := sql.Open("mysql", "root:123456789@tcp(HOST_IP_ADDRESS:3306)/proxy?parseTime=true&loc=Local")
+```
+
+Replace `HOST_IP_ADDRESS` with the host's actual IP.
+
+---
+
+#### 4. **Verify the Connection**
+
+- Start your MySQL server on the host.
+- Start your Docker containers using `docker-compose up --build`.
+- The `proxy` and `server` containers should now connect directly to your external MySQL database.
+
+---
+
+### **Testing the Setup**
+1. Run MySQL queries from your application to ensure the connection works.
+2. Check the MySQL logs on your host for incoming connections from the Docker containers' IPs (e.g., `172.21.0.x`).
+
+---
+
+### **Advantages**
+- No need to Dockerize MySQL.
+- Easier to manage an existing MySQL server.
+
+### **Potential Issues**
+- Network latency if the MySQL server is far from the Docker host.
+- Ensure the MySQL server allows remote connections for the Docker network.
+
+This approach keeps your MySQL database outside Docker while allowing containers to communicate directly with it.

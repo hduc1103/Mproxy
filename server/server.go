@@ -37,7 +37,6 @@ func main() {
 	
 		fmt.Printf("Received message: %s from topic: %s\n", received.Message, msg.Topic())
 	}
-	
 
 	opts := mqtt.NewClientOptions()
 	opts.AddBroker("tcp://mqtt-broker:1883") 
