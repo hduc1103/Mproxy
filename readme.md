@@ -55,7 +55,7 @@ This project implements two mproxy servers which are **TCP Proxy Server** and **
    ```sql
    docker exec -it mysql mysql -u root -p
    USE proxy;  
-   CREATE TABLE messages (id INT AUTO_INCREMENT PRIMARY KEY, device_id VARCHAR(50), content TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);
+   CREATE TABLE messages (id INT AUTO_INCREMENT PRIMARY KEY, device_id VARCHAR(50), message TEXT NOT NULL, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP);
    CREATE TABLE devices (device_id VARCHAR(256) PRIMARY KEY, password VARCHAR(256));
    INSERT INTO devices (device_id, password) VALUES ("device_123", "12345678");
    ```
