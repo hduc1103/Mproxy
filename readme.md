@@ -34,6 +34,7 @@ This project implements two mproxy servers which are **TCP Proxy Server** and **
    ```
 
 3. Set up a MySQL database and create a table for storing messages:
+   - For local testing, you can always set up it in the mysql local host:
    ```sql
    CREATE DATABASE proxy;
    USE proxy;
@@ -49,7 +50,16 @@ This project implements two mproxy servers which are **TCP Proxy Server** and **
    );
    ```
 
-4. Install Image Vernemq on Docker:
+
+   - For Mysql Service Docker Container, you will have to do a little set up. Base on the docker-compose.yml, the database will be created but no table or data exists. 
+   ```sql
+   docker exec -it mysql mysql -u root -p
+   USE proxy;  
+   CREATE TABLE messages (id INT AUTO_INCREMENT PRIMARY KEY, device_id VARCHAR(50), content TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);
+   CREATE TABLE devices (device_id VARCHAR(256) PRIMARY KEY, password VARCHAR(256));
+   INSERT INTO devices (device_id, password) VALUES ("device_123", "12345678");
+   ```
+4. Install Image Vernemq on Docker (this is for manually testing, in  this project everything is included in the docker-compose.yml):
     ```bash
     docker pull vernemq/vernemq
     docker run -d --name vernemq-broker -p 1883:1883 -p 8080:8080 -e "DOCKER_VERNEMQ_ACCEPT_EULA=yes" -e "DOCKER_VERNEMQ_ALLOW_ANONYMOUS=on" vernemq/vernemq
@@ -57,20 +67,16 @@ This project implements two mproxy servers which are **TCP Proxy Server** and **
     ```
 
 ## Configuration
-- The database connection string is hardcoded in the `handleClientMessages` function:
-  ```go
-  "root:<your_mysql_password>@tcp(127.0.0.1:3306)/proxy?parseTime=true&loc=Local"
-  ```
-- The MQTT broker address is configured in the `getBrokerClient` function:
-  ```go
-  opts.AddBroker("mqtt://localhost:1883")
-  ```
+   - Every configuration is clearly defined in docker-compose.yml
 
 ## Running the Project
 1. Start the proxy server:
    ```bash
-   docker start vernemq-broker
-   go run main.go
+   docker-compose up -d
+   ```
+   - The server sometimes exits right after starting since it cannot find the connection to the mqtt server which takes more time to start. In that case, you simply start the server again.
+   ```bash
+   docker start server
    ```
 
 2. The server listens on `localhost:1884` for incoming TCP connections.
